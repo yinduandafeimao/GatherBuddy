@@ -128,7 +128,7 @@ public class GameData
             Data.Fish.Apply(this);
 
             FishingSpots = DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.FishingSpot>()?
-                    .Where(f => f.PlaceName.Row != 0 && (f.TerritoryType.Row > 0 || f.RowId == 10000 || f.RowId >= 10017))
+                    .Where(f => f.PlaceName.Row != 0 && (f.TerritoryType.Row > 0 && f.RowId <= 10000 || f.RowId >= 10017))
                     .Select(f => new FishingSpot(this, f))
                     .Concat(
                         DataManager.GetExcelSheet<SpearfishingNotebook>()?
@@ -190,7 +190,7 @@ public class GameData
 
     public static OceanRoute[] SetupOceanRoutes(DataManager manager, Dictionary<uint, FishingSpot> fishingSpots)
     {
-        var routeSheet = manager.GetExcelSheet<IKDRoute>(ClientLanguage.English)!;
+        var routeSheet = manager.GetExcelSheet<IKDRoute>()!;
         var spotSheet  = manager.GetExcelSheet<IKDSpot>()!;
         var ret        = new OceanRoute[routeSheet.RowCount - 1];
 
