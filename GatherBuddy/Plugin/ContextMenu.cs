@@ -65,8 +65,14 @@ public class ContextMenu : IDisposable
         return null;
     }
 
+    private unsafe GameObjectContextMenuItem? CheckGameObjectItem(IntPtr agent, int offset, Func<nint, bool> validate)
+        => agent != IntPtr.Zero && validate(agent) ? CheckGameObjectItem(*(uint*)(agent + offset)) : null;
+
     private unsafe GameObjectContextMenuItem? CheckGameObjectItem(IntPtr agent, int offset)
         => agent != IntPtr.Zero ? CheckGameObjectItem(*(uint*)(agent + offset)) : null;
+
+    private GameObjectContextMenuItem? CheckGameObjectItem(string name, int offset, Func<nint, bool> validate)
+        => CheckGameObjectItem(Dalamud.GameGui.FindAgentInterface(name), offset, validate);
 
     private GameObjectContextMenuItem? CheckGameObjectItem(string name, int offset)
         => CheckGameObjectItem(Dalamud.GameGui.FindAgentInterface(name), offset);
@@ -88,22 +94,24 @@ public class ContextMenu : IDisposable
 
     private void AddGameObjectItem(GameObjectContextMenuOpenArgs args)
     {
-        // TODO: update when client structs is updated.
         var item = args.ParentAddonName switch
         {
             null                 => HandleSatisfactionSupply(),
-            "ContentsInfoDetail" => CheckGameObjectItem("ContentsInfo",          Offsets.ContentsInfoDetailContextItemId),
-            "RecipeNote"         => CheckGameObjectItem("RecipeNote",            Offsets.RecipeNoteContextItemId),
-            "RecipeTree"         => CheckGameObjectItem(AgentById((AgentId)259), Offsets.AgentItemContextItemId),
-            "RecipeMaterialList" => CheckGameObjectItem(AgentById((AgentId)259), Offsets.AgentItemContextItemId),
-            "GatheringNote"      => CheckGameObjectItem("GatheringNote",         Offsets.GatheringNoteContextItemId),
-            "ItemSearch"         => CheckGameObjectItem(args.Agent,              Offsets.ItemSearchContextItemId),
-            "ChatLog"            => CheckGameObjectItem("ChatLog",               Offsets.ChatLogContextItemId),
+            "ContentsInfoDetail" => CheckGameObjectItem("ContentsInfo",                       Offsets.ContentsInfoDetailContextItemId), // Provisioning
+            "RecipeNote"         => CheckGameObjectItem("RecipeNote",                         Offsets.RecipeNoteContextItemId),
+            "RecipeTree"         => CheckGameObjectItem(AgentById(AgentId.RecipeItemContext), Offsets.AgentItemContextItemId),
+            "RecipeMaterialList" => CheckGameObjectItem(AgentById(AgentId.RecipeItemContext), Offsets.AgentItemContextItemId),
+            "GatheringNote"      => CheckGameObjectItem("GatheringNote",                      Offsets.GatheringNoteContextItemId),
+            "ItemSearch"         => CheckGameObjectItem(args.Agent,                           Offsets.ItemSearchContextItemId),
+            "ChatLog"            => CheckGameObjectItem("ChatLog",                            Offsets.ChatLogContextItemId, ValidateChatLogContext),
             _                    => null,
         };
         if (item != null)
             args.AddCustomItem(item);
     }
+
+    private static unsafe bool ValidateChatLogContext(nint agent)
+        => *(uint*)(agent + Offsets.ChatLogContextItemId + 8) == 3;
 
     private static unsafe IntPtr AgentById(AgentId id)
     {
