@@ -27,7 +27,7 @@ public partial class Interface
         public const string FileNamePopup = "FileNamePopup";
 
         public RecordTable()
-            : base("Fish Records", _plugin.FishRecorder.Records, _catchHeader, _baitHeader, _durationHeader, _castStartHeader,
+            : base("Fish Records", Plugin.FishRecorder.Records, _catchHeader, _baitHeader, _durationHeader, _castStartHeader,
                 _biteTypeHeader, _hookHeader, _amountHeader, _spotHeader, _contentIdHeader, _gatheringHeader, _perceptionHeader, _sizeHeader,
                 _flagHeader)
             => Flags |= ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable | ImGuiTableFlags.Hideable;
@@ -40,7 +40,7 @@ public partial class Interface
             ExtraHeight = ImGui.GetFrameHeightWithSpacing() / ImGuiHelpers.GlobalScale;
             if (_deleteIdx > -1)
             {
-                _plugin.FishRecorder.Remove(_deleteIdx);
+                Plugin.FishRecorder.Remove(_deleteIdx);
                 _deleteIdx = -1;
             }
 
@@ -533,9 +533,8 @@ public partial class Interface
     private void DrawRecordTab()
     {
         using var id  = ImRaii.PushId("Fish Records");
-        using var tab = ImRaii.TabItem("Fish Records");
-        ImGuiUtil.HoverTooltip("The records of my fishing prowess have been greatly exaggerated.\n"
-          + "Find, cleanup and share all data you have collected while fishing.");
+        using var tab = ImRaii.TabItem("鱼类记录");
+        ImGuiUtil.HoverTooltip("找出、清理并分享你在钓鱼时收集到的所有数据。");
         if (!tab)
             return;
 
@@ -549,8 +548,8 @@ public partial class Interface
         ImGui.SameLine();
         if (ImGui.Button("Cleanup"))
         {
-            _plugin.FishRecorder.RemoveDuplicates();
-            _plugin.FishRecorder.RemoveInvalid();
+            Plugin.FishRecorder.RemoveDuplicates();
+            Plugin.FishRecorder.RemoveInvalid();
         }
 
         ImGuiUtil.HoverTooltip("Delete all entries that were marked as invalid for some reason,\n"
@@ -562,7 +561,7 @@ public partial class Interface
         try
         {
             if (ImGui.Button("Copy to Clipboard"))
-                ImGui.SetClipboardText(_plugin.FishRecorder.ExportBase64());
+                ImGui.SetClipboardText(Plugin.FishRecorder.ExportBase64());
             ImGuiUtil.HoverTooltip("Export all fish records to your clipboard, to share them with other people. This may be a lot");
         }
         catch
@@ -574,7 +573,7 @@ public partial class Interface
         try
         {
             if (ImGui.Button("Import from Clipboard"))
-                _plugin.FishRecorder.ImportBase64(ImGui.GetClipboardText());
+                Plugin.FishRecorder.ImportBase64(ImGui.GetClipboardText());
             ImGuiUtil.HoverTooltip("Import a set of fish records shared with you from your clipboard. Should automatically skip duplicates.");
         }
         catch
@@ -639,7 +638,7 @@ public partial class Interface
             try
             {
                 var file = new FileInfo(name);
-                _plugin.FishRecorder.ExportJson(file);
+                Plugin.FishRecorder.ExportJson(file);
             }
             catch
             {

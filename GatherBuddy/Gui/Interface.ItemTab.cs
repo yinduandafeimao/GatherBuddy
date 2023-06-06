@@ -57,18 +57,18 @@ public partial class Interface
             }
         }
 
-        private static readonly NameColumn        _nameColumn        = new() { Label = "Item Name..." };
-        private static readonly NextUptimeColumn  _nextUptimeColumn  = new() { Label = "Next Uptime" };
-        private static readonly AetheryteColumn   _aetheryteColumn   = new() { Label = "Aetheryte" };
-        private static readonly LevelColumn       _levelColumn       = new() { Label = "Lvl..." };
-        private static readonly JobColumn         _jobColumn         = new() { Label = "Gathering" };
-        private static readonly TypeColumn        _typeColumn        = new() { Label = "Node Type" };
-        private static readonly ExpansionColumn   _expansionColumn   = new() { Label = "Exp." };
-        private static readonly FolkloreColumn    _folkloreColumn    = new() { Label = "Folklore" };
-        private static readonly UptimesColumn     _uptimesColumn     = new() { Label = "Uptimes" };
-        private static readonly BestNodeColumn    _bestNodeColumn    = new() { Label = "Best Node" };
-        private static readonly BestZoneColumn    _bestZoneColumn    = new() { Label = "Best Zone" };
-        private static readonly ItemIdColumn      _itemIdColumn      = new() { Label = "Item Id" };
+        private static readonly NameColumn        _nameColumn        = new() { Label = "物品名称" };
+        private static readonly NextUptimeColumn  _nextUptimeColumn  = new() { Label = "距离出现" };
+        private static readonly AetheryteColumn   _aetheryteColumn   = new() { Label = "传送水晶" };
+        private static readonly LevelColumn       _levelColumn       = new() { Label = "等级" };
+        private static readonly JobColumn         _jobColumn         = new() { Label = "采集类型" };
+        private static readonly TypeColumn        _typeColumn        = new() { Label = "采集点类型" };
+        private static readonly ExpansionColumn   _expansionColumn   = new() { Label = "版本" };
+        private static readonly FolkloreColumn    _folkloreColumn    = new() { Label = "传承录" };
+        private static readonly UptimesColumn     _uptimesColumn     = new() { Label = "刷新时间（ET）" };
+        private static readonly BestNodeColumn    _bestNodeColumn    = new() { Label = "最佳采集点" };
+        private static readonly BestZoneColumn    _bestZoneColumn    = new() { Label = "最佳地图" };
+        private static readonly ItemIdColumn      _itemIdColumn      = new() { Label = "物品Id" };
         private static readonly GatheringIdColumn _gatheringIdColumn = new() { Label = "G. Id" };
 
         private class ItemFilterColumn : ColumnFlags<ItemFilter, ExtendedGatherable>
@@ -129,10 +129,10 @@ public partial class Interface
                 ImGui.SameLine();
 
                 var selected = ImGui.Selectable(item.Data.Name[GatherBuddy.Language]);
-                _plugin.Interface.CreateContextMenu(item.Data);
+                Plugin.Interface.CreateContextMenu(item.Data);
 
                 if (selected)
-                    _plugin.Executor.GatherItem(item.Data);
+                    Plugin.Executor.GatherItem(item.Data);
             }
         }
 
@@ -145,7 +145,7 @@ public partial class Interface
             {
                 Flags |= ImGuiTableColumnFlags.DefaultSort;
                 SetFlags(ItemFilter.Available, ItemFilter.Unavailable);
-                SetNames("Currently Available", "Currently Unavailable");
+                SetNames("当前可采集", "当前不可采集");
             }
 
             public override void DrawColumn(ExtendedGatherable item, int _)
@@ -252,7 +252,20 @@ public partial class Interface
                 => SetFlagsAndNames(ItemFilter.Regular, ItemFilter.Unspoiled, ItemFilter.Ephemeral, ItemFilter.Legendary);
 
             public override void DrawColumn(ExtendedGatherable item, int _)
-                => ImGui.Text(item.Data.NodeType.ToString());
+            {
+                var text = item.Data.NodeType.ToString();
+                switch (text)
+                {
+                    case "Regular":   ImGui.Text("通常");
+                        break;
+                    case "Unspoiled": ImGui.Text("未知的");
+                        break;
+                    case "Ephemeral": ImGui.Text("限时的");
+                        break;
+                    case "Legendary": ImGui.Text("传说的");
+                        break;
+                }
+            }
 
             public override int Compare(ExtendedGatherable lhs, ExtendedGatherable rhs)
                 => lhs.Data.NodeType.CompareTo(rhs.Data.NodeType);
@@ -279,7 +292,7 @@ public partial class Interface
             {
                 SetFlags(ItemFilter.ARealmReborn, ItemFilter.Heavensward, ItemFilter.Stormblood, ItemFilter.Shadowbringers,
                     ItemFilter.Endwalker);
-                SetNames("A Realm Reborn", "Heavensward", "Stormblood", "Shadowbringers", "Endwalker");
+                SetNames("2.X 重生之境", "3.X 苍穹之禁城", "4.X 红莲之狂潮", "5.X 暗影之逆焰", "6.X 晓月之终途");
             }
 
             public override void DrawColumn(ExtendedGatherable item, int _)
@@ -331,7 +344,7 @@ public partial class Interface
             public override void DrawColumn(ExtendedGatherable item, int _)
             {
                 if (ImGui.Selectable(ToName(item)))
-                    _plugin.Executor.GatherLocation(item.Uptime.Item1);
+                    Plugin.Executor.GatherLocation(item.Uptime.Item1);
                 HoverTooltip(item.NodeNames);
             }
 
@@ -426,15 +439,14 @@ public partial class Interface
     private void DrawItemTab()
     {
         using var id  = ImRaii.PushId("Gatherables");
-        using var tab = ImRaii.TabItem("Gatherables");
-        ImGuiUtil.HoverTooltip("Breaking rocks with a pickaxe or felling trees counts as gathering, why do you ask?\n"
-          + "Find all information about botanist and miner items you could ever need.");
+        using var tab = ImRaii.TabItem("采集物品");
+        ImGuiUtil.HoverTooltip("采矿工和园艺工相关物品和原料");
         if (!tab)
             return;
 
         _itemTable.ExtraHeight = GatherBuddy.Config.ShowStatusLine ? ImGui.GetTextLineHeight() : 0;
         _itemTable.Draw(ImGui.GetTextLineHeightWithSpacing());
-        DrawStatusLine(_itemTable, "Items");
+        DrawStatusLine(_itemTable, "物品");
         DrawClippy();
     }
 }

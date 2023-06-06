@@ -113,14 +113,14 @@ public readonly struct TimeInterval : IEquatable<TimeInterval>
         return tmp.Time switch
         {
             > RealTime.MillisecondsPerDay => shortString
-                ? $">{tmp.TotalDays}d"
-                : $"{((float)tmp.Time / RealTime.MillisecondsPerDay).ToString("F2", CultureInfo.InvariantCulture)} Days",
+                ? $">{tmp.TotalDays}天"
+                : $"{((float)tmp.Time / RealTime.MillisecondsPerDay).ToString("F2", CultureInfo.InvariantCulture)} 天",
             > RealTime.MillisecondsPerHour => shortString
-                ? $">{tmp.TotalHours}h"
-                : $"{tmp.TotalHours:D2}:{tmp.CurrentMinute:D2} Hours",
+                ? $">{tmp.TotalHours}小时"
+                : $"{tmp.TotalHours:D2} 时 {tmp.CurrentMinute:D2} 分",
             _ => shortString
-                ? $"{tmp.TotalMinutes}:{tmp.CurrentSecond:D2}m"
-                : $"{tmp.TotalMinutes:D2}:{tmp.CurrentSecond:D2} Minutes",
+                ? $"{tmp.TotalMinutes}:{tmp.CurrentSecond:D2}"
+                : $"{tmp.TotalMinutes:D2} 分 {tmp.CurrentSecond:D2} 秒",
         };
     }
 
@@ -129,7 +129,7 @@ public readonly struct TimeInterval : IEquatable<TimeInterval>
     {
         if (this == Always)
         {
-            timeString = "Always";
+            timeString = "常驻";
             return true;
         }
 

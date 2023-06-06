@@ -32,8 +32,8 @@ public partial class Interface
             if (_nameColumnWidth != 0)
                 return;
 
-            _nameColumnWidth      = _plugin.LocationManager.AllLocations.Max(l => TextWidth(l.Name)) / ImGuiHelpers.GlobalScale;
-            _territoryColumnWidth = _plugin.LocationManager.AllLocations.Max(l => TextWidth(l.Territory.Name)) / ImGuiHelpers.GlobalScale;
+            _nameColumnWidth      = Plugin.LocationManager.AllLocations.Max(l => TextWidth(l.Name)) / ImGuiHelpers.GlobalScale;
+            _territoryColumnWidth = Plugin.LocationManager.AllLocations.Max(l => TextWidth(l.Territory.Name)) / ImGuiHelpers.GlobalScale;
             _aetheryteColumnWidth = GatherBuddy.GameData.Aetherytes.Values.Max(a => TextWidth(a.Name)) / ImGuiHelpers.GlobalScale;
             _coordColumnWidth     = TextWidth("X-Coord") / ImGuiHelpers.GlobalScale + Table.ArrowWidth;
             _radiusColumnWidth    = TextWidth("Radius") / ImGuiHelpers.GlobalScale + Table.ArrowWidth;
@@ -173,12 +173,12 @@ public partial class Interface
                 using var color       = ImRaii.PushColor(ImGuiCol.FrameBg, ColorId.ChangedLocationBg.Value(), overwritten);
                 var       currentName = location.ClosestAetheryte?.Name ?? "None";
                 if (_aetheryteCombo.Draw(currentName, out var newIdx))
-                    _plugin.LocationManager.SetAetheryte(location, _aetherytes[newIdx]);
+                    Plugin.LocationManager.SetAetheryte(location, _aetherytes[newIdx]);
                 if (overwritten)
                 {
                     ImGuiUtil.HoverTooltip($"Right-click to restore default. ({location.DefaultAetheryte?.Name ?? "None"})");
                     if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                        _plugin.LocationManager.SetAetheryte(location, location.DefaultAetheryte);
+                        Plugin.LocationManager.SetAetheryte(location, location.DefaultAetheryte);
                 }
             }
         }
@@ -198,12 +198,12 @@ public partial class Interface
                 var       x           = location.IntegralXCoord / 100f;
                 ImGui.SetNextItemWidth(-1);
                 if (ImGui.DragFloat("##x", ref x, 0.05f, 1f, 42f, "%.2f", ImGuiSliderFlags.AlwaysClamp))
-                    _plugin.LocationManager.SetXCoord(location, (int)(x * 100f + 0.5f));
+                    Plugin.LocationManager.SetXCoord(location, (int)(x * 100f + 0.5f));
                 if (overwritten)
                 {
                     ImGuiUtil.HoverTooltip($"Right-click to restore default. ({location.DefaultXCoord / 100f:0.00})");
                     if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                        _plugin.LocationManager.SetXCoord(location, location.DefaultXCoord);
+                        Plugin.LocationManager.SetXCoord(location, location.DefaultXCoord);
                 }
             }
 
@@ -226,12 +226,12 @@ public partial class Interface
                 var       y           = location.IntegralYCoord / 100f;
                 ImGui.SetNextItemWidth(-1);
                 if (ImGui.DragFloat("##y", ref y, 0.05f, 1f, 42f, "%.2f", ImGuiSliderFlags.AlwaysClamp))
-                    _plugin.LocationManager.SetYCoord(location, (int)(y * 100f + 0.5f));
+                    Plugin.LocationManager.SetYCoord(location, (int)(y * 100f + 0.5f));
                 if (overwritten)
                 {
                     ImGuiUtil.HoverTooltip($"Right-click to restore default. ({location.DefaultYCoord / 100f:0.00})");
                     if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                        _plugin.LocationManager.SetYCoord(location, location.DefaultYCoord);
+                        Plugin.LocationManager.SetYCoord(location, location.DefaultYCoord);
                 }
             }
 
@@ -254,12 +254,12 @@ public partial class Interface
                 ImGui.SetNextItemWidth(-1);
                 int radius = location.Radius;
                 if (ImGui.DragInt("##radius", ref radius, 0.1f, 0, IMarkable.RadiusMax))
-                    _plugin.LocationManager.SetRadius(location, Math.Clamp((ushort)radius, (ushort)0, IMarkable.RadiusMax));
+                    Plugin.LocationManager.SetRadius(location, Math.Clamp((ushort)radius, (ushort)0, IMarkable.RadiusMax));
                 if (overwritten)
                 {
                     ImGuiUtil.HoverTooltip($"Right-click to restore default. ({location.DefaultRadius})");
                     if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                        _plugin.LocationManager.SetRadius(location, location.DefaultRadius);
+                        Plugin.LocationManager.SetRadius(location, location.DefaultRadius);
                 }
             }
 
@@ -335,7 +335,7 @@ public partial class Interface
 
                 if (ImGuiUtil.DrawDisabledButton(FontAwesomeIcon.Map.ToIconString(), new Vector2(ImGui.GetFrameHeight()), tt,
                         markers.Count == 0 || invalid, true))
-                    _plugin.LocationManager.SetMarkers(location, markers);
+                    Plugin.LocationManager.SetMarkers(location, markers);
 
                 ImGui.SameLine();
                 tt = location.Markers.Length == 0
@@ -343,12 +343,12 @@ public partial class Interface
                     : $"Remove the stored markers for this location:\n\n{string.Join("\n", location.Markers.Select(m => $"{m.X:F2} - {m.Y:F2} - {m.Z:F2}"))}";
                 if (ImGuiUtil.DrawDisabledButton(FontAwesomeIcon.Trash.ToIconString(), new Vector2(ImGui.GetFrameHeight()), tt,
                         location.Markers.Length == 0, true))
-                    _plugin.LocationManager.SetMarkers(location, Array.Empty<Vector3>());
+                    Plugin.LocationManager.SetMarkers(location, Array.Empty<Vector3>());
             }
         }
 
         public LocationTable()
-            : base("##LocationTable", _plugin.LocationManager.AllLocations, _nameColumn,
+            : base("##LocationTable", Plugin.LocationManager.AllLocations, _nameColumn,
                 _typeColumn, _aetheryteColumn, _xCoordColumn, _yCoordColumn, _radiusColumn, _markerColumn, _territoryColumn, _itemColumn)
         { }
     }
@@ -358,9 +358,9 @@ public partial class Interface
     private void DrawLocationsTab()
     {
         using var id  = ImRaii.PushId("Locations");
-        using var tab = ImRaii.TabItem("Locations");
-        ImGuiUtil.HoverTooltip("Default locations getting you down?\n"
-          + "Set up custom aetherytes or map marker locations for specific nodes.");
+        using var tab = ImRaii.TabItem("地图");
+        ImGuiUtil.HoverTooltip("厌倦了默认位置？\n"
+          + "为特定位置设置自定义以太水晶或地图标记。");
 
         if (!tab)
             return;

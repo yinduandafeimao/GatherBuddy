@@ -161,9 +161,9 @@ public partial class Interface
             return;
 
         ImGuiUtil.DrawTableColumn("Current Save Changes");
-        ImGuiUtil.DrawTableColumn(_plugin.FishRecorder.Changes.ToString());
+        ImGuiUtil.DrawTableColumn(Plugin.FishRecorder.Changes.ToString());
         ImGuiUtil.DrawTableColumn("Next Timed Save");
-        ImGuiUtil.DrawTableColumn(_plugin.FishRecorder.SaveTime == TimeStamp.MaxValue ? "Never" : TimeInterval.DurationString(_plugin.FishRecorder.SaveTime, TimeStamp.UtcNow, false));
+        ImGuiUtil.DrawTableColumn(Plugin.FishRecorder.SaveTime == TimeStamp.MaxValue ? "Never" : TimeInterval.DurationString(Plugin.FishRecorder.SaveTime, TimeStamp.UtcNow, false));
         ImGuiUtil.DrawTableColumn("UiState Address");
         ImGuiUtil.DrawTableColumn($"{(IntPtr)FFXIVClientStructs.FFXIV.Client.Game.UI.UIState.Instance():X}");
         ImGuiUtil.DrawTableColumn("Event Framework Address");
@@ -179,11 +179,11 @@ public partial class Interface
         ImGuiUtil.DrawTableColumn("Bite Type");
         ImGuiUtil.DrawTableColumn(GatherBuddy.TugType.Bite.ToString());
 
-        var record = _plugin.FishRecorder.Record;
+        var record = Plugin.FishRecorder.Record;
         ImGuiUtil.DrawTableColumn("Last Fishing State");
-        ImGuiUtil.DrawTableColumn(_plugin.FishRecorder.LastState.ToString());
+        ImGuiUtil.DrawTableColumn(Plugin.FishRecorder.LastState.ToString());
         ImGuiUtil.DrawTableColumn("Current Step");
-        ImGuiUtil.DrawTableColumn(_plugin.FishRecorder.Step.ToString());
+        ImGuiUtil.DrawTableColumn(Plugin.FishRecorder.Step.ToString());
         ImGuiUtil.DrawTableColumn("ContentIdHash");
         ImGuiUtil.DrawTableColumn(record.ContentIdHash.ToString());
         ImGuiUtil.DrawTableColumn("Gathering");
@@ -197,14 +197,14 @@ public partial class Interface
         ImGuiUtil.DrawTableColumn("Current Bait");
         ImGuiUtil.DrawTableColumn($"{record.Bait.Name} ({record.Bait.Id})");
         ImGuiUtil.DrawTableColumn("Duration");
-        ImGuiUtil.DrawTableColumn(_plugin.FishRecorder.Timer.ElapsedMilliseconds.ToString());
+        ImGuiUtil.DrawTableColumn(Plugin.FishRecorder.Timer.ElapsedMilliseconds.ToString());
         ImGuiUtil.DrawTableColumn("BiteType");
         ImGuiUtil.DrawTableColumn(record.Tug.ToString());
         ImGuiUtil.DrawTableColumn("HookSet");
         ImGuiUtil.DrawTableColumn(record.Hook.ToString());
         ImGuiUtil.DrawTableColumn("Last Catch");
         ImGuiUtil.DrawTableColumn(
-            $"{_plugin.FishRecorder.LastCatch?.Name[ClientLanguage.ChineseSimplified] ?? "None"} ({_plugin.FishRecorder.LastCatch?.ItemId ?? 0} - {_plugin.FishRecorder.LastCatch?.FishId ?? 0})");
+            $"{Plugin.FishRecorder.LastCatch?.Name[ClientLanguage.ChineseSimplified] ?? "None"} ({Plugin.FishRecorder.LastCatch?.ItemId ?? 0} - {Plugin.FishRecorder.LastCatch?.FishId ?? 0})");
         ImGuiUtil.DrawTableColumn("Current Catch");
         ImGuiUtil.DrawTableColumn(
             $"{record.Catch?.Name[ClientLanguage.ChineseSimplified] ?? "None"} ({record.Catch?.ItemId ?? 0} - {record.Catch?.FishId ?? 0}) - of size {record.Size / 10f} times {record.Amount}");
@@ -224,7 +224,7 @@ public partial class Interface
         if (!table)
             return;
 
-        foreach (var (fishId, data) in _plugin.FishRecorder.Times)
+        foreach (var (fishId, data) in Plugin.FishRecorder.Times)
         {
             ImGuiUtil.DrawTableColumn(GatherBuddy.GameData.Fishes[fishId].Name[ClientLanguage.ChineseSimplified]);
             ImGuiUtil.DrawTableColumn("Overall");
@@ -336,7 +336,7 @@ public partial class Interface
         if (!table)
             return;
 
-        var nextAlarm = _plugin.AlarmManager.ActiveAlarms.Count > 0 ? _plugin.AlarmManager.ActiveAlarms[0].Item2 : TimeStamp.Epoch;
+        var nextAlarm = Plugin.AlarmManager.ActiveAlarms.Count > 0 ? Plugin.AlarmManager.ActiveAlarms[0].Item2 : TimeStamp.Epoch;
         var (abs, rel) = nextAlarm != TimeStamp.Epoch
             ? (nextAlarm.LocalTime.ToString(CultureInfo.InvariantCulture),
                 TimeInterval.DurationString(nextAlarm, GatherBuddy.Time.ServerTime, false))
@@ -345,16 +345,16 @@ public partial class Interface
         ImGuiUtil.DrawTableColumn("Enabled");
         ImGuiUtil.DrawTableColumn(GatherBuddy.Config.AlarmsEnabled.ToString());
         ImGuiUtil.DrawTableColumn("Dirty");
-        ImGuiUtil.DrawTableColumn(_plugin.AlarmManager.Dirty.ToString());
+        ImGuiUtil.DrawTableColumn(Plugin.AlarmManager.Dirty.ToString());
         ImGuiUtil.DrawTableColumn("Next Change (Absolute)");
         ImGuiUtil.DrawTableColumn(abs);
         ImGuiUtil.DrawTableColumn("Next Change (Relative)");
         ImGuiUtil.DrawTableColumn(rel);
         ImGuiUtil.DrawTableColumn("#Alarm Groups");
-        ImGuiUtil.DrawTableColumn(_plugin.AlarmManager.Alarms.Count.ToString());
+        ImGuiUtil.DrawTableColumn(Plugin.AlarmManager.Alarms.Count.ToString());
         ImGuiUtil.DrawTableColumn("#Enabled Alarms");
-        ImGuiUtil.DrawTableColumn(_plugin.AlarmManager.ActiveAlarms.Count.ToString());
-        foreach (var (alarm, state) in _plugin.AlarmManager.ActiveAlarms)
+        ImGuiUtil.DrawTableColumn(Plugin.AlarmManager.ActiveAlarms.Count.ToString());
+        foreach (var (alarm, state) in Plugin.AlarmManager.ActiveAlarms)
         {
             ImGuiUtil.DrawTableColumn(alarm.Name.Any() ? alarm.Name : alarm.Item.Name[ClientLanguage.ChineseSimplified]);
             ImGuiUtil.DrawTableColumn($"{state} ({TimeInterval.DurationString(state, GatherBuddy.Time.ServerTime, false)})");
@@ -492,15 +492,15 @@ public partial class Interface
             ImGui.Text("Version");
             ImGui.Text(GatherBuddyIpc.VersionName);
             ImGui.Text(GatherBuddyIpc.IdentifyName);
-            if (_plugin.Ipc._identifyProvider != null && ImGui.InputTextWithHint("##IPCIdentifyTest", "Identify...", ref _identifyTest, 64))
+            if (Plugin.Ipc._identifyProvider != null && ImGui.InputTextWithHint("##IPCIdentifyTest", "Identify...", ref _identifyTest, 64))
                 _lastItemIdentified = Dalamud.PluginInterface.GetIpcSubscriber<string, uint>(GatherBuddyIpc.IdentifyName)
                     .InvokeFunc(_identifyTest);
             group1.Dispose();
             ImGui.SameLine();
             using var group2 = ImRaii.Group();
             ImGui.Text(GatherBuddyIpc.IpcVersion.ToString());
-            ImGui.Text(_plugin.Ipc._versionProvider != null ? "Available" : "Unavailable");
-            ImGui.Text(_plugin.Ipc._identifyProvider != null ? "Available" : "Unavailable");
+            ImGui.Text(Plugin.Ipc._versionProvider != null ? "Available" : "Unavailable");
+            ImGui.Text(Plugin.Ipc._identifyProvider != null ? "Available" : "Unavailable");
             ImGui.Text(_lastItemIdentified.ToString());
         }
     }

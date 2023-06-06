@@ -34,7 +34,7 @@ public partial class Interface
         public class GatherWindowSelector : ItemSelector<GatherWindowPreset>
         {
             public GatherWindowSelector()
-                : base(_plugin.GatherWindowManager.Presets, Flags.All)
+                : base(Plugin.GatherWindowManager.Presets, Flags.All)
             { }
 
             protected override bool Filtered(int idx)
@@ -49,13 +49,13 @@ public partial class Interface
 
             protected override bool OnDelete(int idx)
             {
-                _plugin.GatherWindowManager.DeletePreset(idx);
+                Plugin.GatherWindowManager.DeletePreset(idx);
                 return true;
             }
 
             protected override bool OnAdd(string name)
             {
-                _plugin.GatherWindowManager.AddPreset(new GatherWindowPreset()
+                Plugin.GatherWindowManager.AddPreset(new GatherWindowPreset()
                 {
                     Name = name,
                 });
@@ -69,7 +69,7 @@ public partial class Interface
 
                 GatherWindowPreset.FromConfig(cfg, out var preset);
                 preset.Name = name;
-                _plugin.GatherWindowManager.AddPreset(preset);
+                Plugin.GatherWindowManager.AddPreset(preset);
                 return true;
             }
 
@@ -78,9 +78,9 @@ public partial class Interface
                 if (Items.Count <= idx || idx < 0)
                     return false;
 
-                var preset = _plugin.GatherWindowManager.Presets[idx].Clone();
+                var preset = Plugin.GatherWindowManager.Presets[idx].Clone();
                 preset.Name = name;
-                _plugin.GatherWindowManager.AddPreset(preset);
+                Plugin.GatherWindowManager.AddPreset(preset);
                 return true;
             }
 
@@ -91,15 +91,15 @@ public partial class Interface
                 if (data is not GatherWindowDragDropData obj)
                     return;
 
-                var preset = _plugin.GatherWindowManager.Presets[idx];
-                _plugin.GatherWindowManager.RemoveItem(obj.Preset, obj.ItemIdx);
-                _plugin.GatherWindowManager.AddItem(preset, obj.Item);
+                var preset = Plugin.GatherWindowManager.Presets[idx];
+                Plugin.GatherWindowManager.RemoveItem(obj.Preset, obj.ItemIdx);
+                Plugin.GatherWindowManager.AddItem(preset, obj.Item);
             }
 
 
             protected override bool OnMove(int idx1, int idx2)
             {
-                _plugin.GatherWindowManager.MovePreset(idx1, idx2);
+                Plugin.GatherWindowManager.MovePreset(idx1, idx2);
                 return true;
             }
         }
@@ -134,7 +134,7 @@ public partial class Interface
         if (ImGuiUtil.DrawDisabledButton("Create Alarms", Vector2.Zero, "Create a new Alarm Group from this gather window preset.", _gatherWindowCache.Selector.Current == null))
         {
             var preset = new AlarmGroup(_gatherWindowCache.Selector.Current!);
-            _plugin.AlarmManager.AddGroup(preset);
+            Plugin.AlarmManager.AddGroup(preset);
         }
 
         ImGuiComponents.HelpMarker(
@@ -149,14 +149,14 @@ public partial class Interface
     {
         if (ImGuiUtil.DrawEditButtonText(0, _gatherWindowCache.EditName ? preset.Name : CheckUnnamed(preset.Name), out var newName,
                 ref _gatherWindowCache.EditName, IconButtonSize, SetInputWidth, 64))
-            _plugin.GatherWindowManager.ChangeName(preset, newName);
+            Plugin.GatherWindowManager.ChangeName(preset, newName);
         if (ImGuiUtil.DrawEditButtonText(1, _gatherWindowCache.EditDesc ? preset.Description : CheckUndescribed(preset.Description),
                 out var newDesc, ref _gatherWindowCache.EditDesc, IconButtonSize, 2 * SetInputWidth, 128))
-            _plugin.GatherWindowManager.ChangeDescription(preset, newDesc);
+            Plugin.GatherWindowManager.ChangeDescription(preset, newDesc);
 
         var tmp = preset.Enabled;
         if (ImGui.Checkbox("Enabled##preset", ref tmp) && tmp != preset.Enabled)
-            _plugin.GatherWindowManager.TogglePreset(preset);
+            Plugin.GatherWindowManager.TogglePreset(preset);
 
         ImGui.NewLine();
         ImGui.SetCursorPosX(ImGui.GetCursorPosX() - ImGui.GetStyle().ItemInnerSpacing.X);
@@ -171,24 +171,24 @@ public partial class Interface
             var       item  = preset.Items[i];
             if (ImGuiUtil.DrawDisabledButton(FontAwesomeIcon.Trash.ToIconString(), IconButtonSize, "Delete this item from the preset...", false,
                     true))
-                _plugin.GatherWindowManager.RemoveItem(preset, i--);
+                Plugin.GatherWindowManager.RemoveItem(preset, i--);
 
             ImGui.SameLine();
             if (_gatherGroupCache.GatherableSelector.Draw(item.Name[GatherBuddy.Language], out var newIdx))
-                _plugin.GatherWindowManager.ChangeItem(preset, GatherGroupCache.AllGatherables[newIdx], i);
+                Plugin.GatherWindowManager.ChangeItem(preset, GatherGroupCache.AllGatherables[newIdx], i);
             group.Dispose();
 
             _gatherWindowCache.Selector.CreateDropSource(new GatherWindowDragDropData(preset, item, i), item.Name[GatherBuddy.Language]);
 
             var localIdx = i;
             _gatherWindowCache.Selector.CreateDropTarget<GatherWindowDragDropData>(d
-                => _plugin.GatherWindowManager.MoveItem(d.Preset, d.ItemIdx, localIdx));
+                => Plugin.GatherWindowManager.MoveItem(d.Preset, d.ItemIdx, localIdx));
         }
 
         if (ImGuiUtil.DrawDisabledButton(FontAwesomeIcon.Plus.ToIconString(), IconButtonSize,
                 "Add this item at the end of the preset, if it is not already included...",
                 preset.Items.Contains(GatherGroupCache.AllGatherables[_gatherWindowCache.NewGatherableIdx]), true))
-            _plugin.GatherWindowManager.AddItem(preset, GatherGroupCache.AllGatherables[_gatherWindowCache.NewGatherableIdx]);
+            Plugin.GatherWindowManager.AddItem(preset, GatherGroupCache.AllGatherables[_gatherWindowCache.NewGatherableIdx]);
 
         ImGui.SameLine();
         if (_gatherGroupCache.GatherableSelector.Draw(_gatherWindowCache.NewGatherableIdx, out var idx))
@@ -198,11 +198,11 @@ public partial class Interface
     private void DrawGatherWindowTab()
     {
         using var id  = ImRaii.PushId("GatherWindow");
-        using var tab = ImRaii.TabItem("Gather Window");
+        using var tab = ImRaii.TabItem("采集悬浮窗");
 
         ImGuiUtil.HoverTooltip(
-            "Config window too big? Why can't you hold all this information?\n"
-          + "Prepare a small window with only those items that actually interest you!");
+            "配置窗口太大了？为什么不能容纳所有这些信息？\n"
+          + "显示一个悬浮窗，只展示那些你真正感兴趣的项目！");
 
         if (!tab)
             return;

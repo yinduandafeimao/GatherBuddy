@@ -56,10 +56,10 @@ public static class ColorIdExtensions
     public static (uint DefaultColor, string Name, string Description) Data(this ColorId color)
         => color switch
         {
-            ColorId.AvailableItem                          => (0xFF20B020, "Interface Available Items",                                      "Items that are always or currently available."),
-            ColorId.UpcomingItem                           => (0xFF20B0A0, "Interface Upcoming Items",                                       "Items that are not currently available."),
-            ColorId.DependentAvailableFish                 => (0xFFFF3030, "Interface Dependent Available Fish",                             "Fish that are currently available based on their own conditions, but require intuition or mooches that have other requirements."),
-            ColorId.DependentUpcomingFish                  => (0xFFA020A0, "Interface Dependent Upcoming Fish",                              "Fish that are not currently available based on their own conditions, but also require intuition or mooches that have other requirements."),
+            ColorId.AvailableItem                          => (0xFF20B020, "已经出现的物品",                                      "当前可以去收集的物品"),
+            ColorId.UpcomingItem                           => (0xFF20B0A0, "还未出现的物品",                                       "当前不可收集的物品"),
+            ColorId.DependentAvailableFish                 => (0xFFFF3030, "有前置已经出现的鱼",                             "当前已经出现的鱼，但是还需要完成前置要求"),
+            ColorId.DependentUpcomingFish                  => (0xFFA020A0, "有前置还未出现的鱼",                              "当前还未出现的鱼，同时还需要完成前置要求"),
             ColorId.DisabledText                           => (0xFF606060, "Interface Disabled Text",                                        "Text for disabled objects in selectors."),
             ColorId.WarningBg                              => (0xA00000A0, "Warning Background",                                             "The background color of warning badges in the user interface."),
             ColorId.ChangedLocationBg                      => (0x80009000, "Custom Location Data Background",                                "The background of customly set aetherytes or coordinates for specific locations."),

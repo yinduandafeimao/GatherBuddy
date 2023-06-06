@@ -16,7 +16,7 @@ public partial class Interface : Window, IDisposable
     private const string PluginName = "GatherBuddy";
     private const float  MinSize    = 700;
 
-    private static GatherBuddy _plugin                 = null!;
+    public static GatherBuddy Plugin                 = null!;
     private        TimeStamp   _earliestKeyboardToggle = TimeStamp.Epoch;
 
     private static List<ExtendedFish>? _extendedFishList;
@@ -29,11 +29,11 @@ public partial class Interface : Window, IDisposable
     public Interface(GatherBuddy plugin)
         : base(GatherBuddy.Version.Length > 0 ? $"{PluginName} v{GatherBuddy.Version}###GatherBuddyMain" : PluginName)
     {
-        _plugin            = plugin;
-        _gatherGroupCache  = new GatherGroupCache(_plugin.GatherGroupManager);
+        Plugin            = plugin;
+        _gatherGroupCache  = new GatherGroupCache(Plugin.GatherGroupManager);
         _gatherWindowCache = new GatherWindowCache();
         _locationTable     = new LocationTable();
-        _alarmCache        = new AlarmCache(_plugin.AlarmManager);
+        _alarmCache        = new AlarmCache(Plugin.AlarmManager);
         _recordTable       = new RecordTable();
         SizeConstraints = new WindowSizeConstraints()
         {
@@ -58,10 +58,11 @@ public partial class Interface : Window, IDisposable
         DrawAlarmTab();
         DrawGatherGroupTab();
         DrawGatherWindowTab();
-        DrawConfigTab();
         DrawLocationsTab();
         DrawRecordTab();
         DrawDebugTab();
+        DrawConfigTab();
+        DrawAbout();
     }
 
     public void UpdateFlags()

@@ -11,6 +11,7 @@ using ImGuiNET;
 using ImGuiScene;
 using static GatherBuddy.Gui.Interface;
 using ImRaii = OtterGui.Raii.ImRaii;
+using Dalamud.Logging;
 
 namespace GatherBuddy.FishTimer;
 
@@ -126,7 +127,7 @@ public partial class FishTimerWindow
         {
             var difference      = 2 * ImGuiHelpers.GlobalScale;
             var difference2     = 2 * difference;
-            var offsetStartBait = size * _baitSpecific.Min / GatherBuddy.Config.FishTimerScale;
+            var offsetStartBait = size * _baitSpecific.Min / GatherBuddy.Config.FishTimerScale; //咬钩时间
             var offsetEndBait   = size * _baitSpecific.Max / GatherBuddy.Config.FishTimerScale;
             var offsetStartAll  = size * _all.Min / GatherBuddy.Config.FishTimerScale;
             var offsetEndAll    = size * _all.Max / GatherBuddy.Config.FishTimerScale;
@@ -145,6 +146,10 @@ public partial class FishTimerWindow
                 offsetEndBait   += difference;
             }
 
+            // PluginLog.Log(_fish.Data.ItemData.Name);    //鱼名称
+            // PluginLog.Log(_fish.Data.FishData.Item.ToString()); //鱼ID
+            // PluginLog.Log(_fish.Data.FishingSpots[0].Id.ToString()); //钓场ID
+            
             // Highlight via a shaded front drop.
             var areaEnd   = offsetEndBait < 0 || offsetEndBait > size - difference2 ? size : offsetEndBait;
             var areaStart = offsetStartBait < 0 || offsetStartBait > size - difference2 ? 0 : offsetStartBait;
@@ -196,6 +201,7 @@ public partial class FishTimerWindow
             ImGui.AlignTextToFramePadding();
             using var color = ImRaii.PushColor(ImGuiCol.Text, ColorId.FishTimerText.Value());
             ImGui.Text(_textLine);
+            Interface.Plugin.Interface.CreateContextMenu(_fish.Data);
             hovered |= ImGui.IsItemHovered();
 
             if (hovered && _fish != null)

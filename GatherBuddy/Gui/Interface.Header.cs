@@ -78,10 +78,10 @@ public partial class Interface
 
     private void DrawLastAlarm(bool which, string failureText)
     {
-        var alarmData = which ? _plugin.AlarmManager.LastItemAlarm : _plugin.AlarmManager.LastFishAlarm;
+        var alarmData = which ? Plugin.AlarmManager.LastItemAlarm : Plugin.AlarmManager.LastFishAlarm;
         if (alarmData == null)
         {
-            ImGuiUtil.DrawDisabledButton(failureText, _headerCache.AlarmButtonSize, "Click to /gather this alarm.", true);
+            ImGuiUtil.DrawDisabledButton(failureText, _headerCache.AlarmButtonSize, "单击对当前闹钟触发对象使用/gather命令", true);
             return;
         }
 
@@ -89,22 +89,22 @@ public partial class Interface
 
         var text = $"{(alarm.Name.Any() ? alarm.Name : alarm.Item.Name[GatherBuddy.Language])}###{(which ? "itemAlarm" : "fishAlarm")}";
         var desc =
-            $"Click to /gather this alarm.\n{loc.Name} - {loc.ClosestAetheryte?.Name ?? "None"}\n{time.Start.LocalTime}\n{time.End.LocalTime}";
+            $"单击对当前闹钟触发对象使用/gather命令\n{loc.Name} - {loc.ClosestAetheryte?.Name ?? "None"}\n{time.Start.LocalTime}\n{time.End.LocalTime}";
 
         if (!ImGuiUtil.DrawDisabledButton(text, _headerCache.AlarmButtonSize, desc, false))
             return;
 
         if (which)
-            _plugin.Executor.GatherItemByName("alarm");
+            Plugin.Executor.GatherItemByName("alarm");
         else
-            _plugin.Executor.GatherFishByName("alarm");
+            Plugin.Executor.GatherFishByName("alarm");
     }
 
     private void DrawLastItemAlarm()
-        => DrawLastAlarm(true, "No Item Alarm Triggered");
+        => DrawLastAlarm(true, "未触发采集闹钟");
 
     private void DrawLastFishAlarm()
-        => DrawLastAlarm(false, "No Fish Alarm Triggered");
+        => DrawLastAlarm(false, "未触发钓鱼闹钟");
 
 
     private void DrawAlarmRow()
@@ -121,7 +121,7 @@ public partial class Interface
     private static void DrawEorzeaTime(string time)
     {
         ImGuiUtil.DrawTextButton(time, Vector2.UnitY * WeatherIconSize.Y, ColorId.HeaderEorzeaTime.Value());
-        ImGuiUtil.HoverTooltip("If this does not correspond to your in-game Eorzea Time, verify that your windows system time is accurate.");
+        ImGuiUtil.HoverTooltip("如果此时间与游戏内的艾欧泽亚时间不相符，请确保 Windows 系统时间准确无误。");
     }
 
     private static void DrawNextEorzeaHour(string hour, Vector2 size)
@@ -168,7 +168,7 @@ public partial class Interface
         nextHourS    -= nextHourM * RealTime.SecondsPerMinute;
         nextWeatherS -= nextWeatherM * RealTime.SecondsPerMinute;
 
-        var nextWeatherString = $"  {nextWeatherM:D2}:{nextWeatherS:D2} Min.  ";
+        var nextWeatherString = $"  {nextWeatherM:D2}:{nextWeatherS:D2} 分  ";
         var width = -(ImGui.CalcTextSize(nextWeatherString).X
           + (WeatherIconSize.X + ItemSpacing.X + FramePadding.X) * 3);
 
@@ -176,7 +176,7 @@ public partial class Interface
         using var _ = ImRaii.Group();
         DrawEorzeaTime($"ET {GatherBuddy.Time.EorzeaHourOfDay:D2}:{GatherBuddy.Time.EorzeaMinuteOfHour:D2}");
         ImGui.SameLine();
-        DrawNextEorzeaHour($"{nextHourM:D2}:{nextHourS:D2} Min to next hour.", new Vector2(width, WeatherIconSize.Y));
+        DrawNextEorzeaHour($"到下个艾欧泽亚小时还有 {nextHourM:D2}:{nextHourS:D2} ", new Vector2(width, WeatherIconSize.Y));
         ImGui.SameLine();
         DrawNextWeather(nextWeatherString);
     }

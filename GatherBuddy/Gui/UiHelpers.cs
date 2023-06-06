@@ -16,7 +16,7 @@ public partial class Interface
 {
     internal static bool DrawLocationInput(IGatherable item, ILocation? current, out ILocation? ret)
     {
-        const string noPreferred = "No Preferred Location";
+        const string noPreferred = "没有首选地点";
         var          width       = SetInputWidth * 0.85f;
         ret = current;
         if (item.Locations.Count() == 1)
@@ -79,7 +79,7 @@ public partial class Interface
             using var tt = ImRaii.Tooltip();
 
             if (uptimeDependency)
-                ImGuiUtil.DrawTextButton("Uptime Dependency", Vector2.Zero, 0xFF202080);
+                ImGuiUtil.DrawTextButton("需前置鱼", Vector2.Zero, 0xFF202080);
 
             if (!char.IsLetter(timeString[0]))
                 ImGui.Text($"{uptime.Start}\n{uptime.End}\n{uptime.DurationString()}");

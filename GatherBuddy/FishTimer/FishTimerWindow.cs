@@ -12,6 +12,7 @@ using OtterGui.Raii;
 using FishingSpot = GatherBuddy.Classes.FishingSpot;
 using TimeStamp = GatherBuddy.Time.TimeStamp;
 
+
 namespace GatherBuddy.FishTimer;
 
 public partial class FishTimerWindow : Window
@@ -279,6 +280,7 @@ public partial class FishTimerWindow : Window
             DrawSecondLines();
             foreach (var fish in _availableFish)
                 fish.Draw(this);
+                
 
             DrawProgressLine();
         }

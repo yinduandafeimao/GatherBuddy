@@ -226,9 +226,9 @@ public partial class Interface
             var minutes = intuition / RealTime.SecondsPerMinute;
             var seconds = intuition % RealTime.SecondsPerMinute;
             if (seconds == 0)
-                return minutes == 1 ? "Intuition for 1 Minute" : string.Intern($"Intuition for {minutes} Minutes");
+                return minutes == 1 ? "捕鱼人之识 1分钟 " : string.Intern($"捕鱼人之识 {minutes}分钟");
 
-            return string.Intern($"Intuition for {minutes}:{seconds:D2} Minutes");
+            return string.Intern($"捕鱼人之识 {minutes}分{seconds:D2}秒");
         }
 
         public ExtendedFish(Fish data)
@@ -247,12 +247,12 @@ public partial class Interface
             if (!Aetherytes.Contains("\n"))
                 Aetherytes = '\0' + Aetherytes;
             Patch = string.Intern($"Patch {data.Patch.ToVersionString()}");
-            FishType = data.OceanFish ? "Ocean Fish" :
-                data.IsSpearFish      ? "Spearfishing" :
-                data.IsBigFish        ? "Big Fish" : "Regular Fish";
+            FishType = data.OceanFish ? "海钓鱼" :
+                data.IsSpearFish      ? "叉鱼" :
+                data.IsBigFish        ? "鱼王" : "常规鱼";
 
             Time = !data.FishRestrictions.HasFlag(FishRestrictions.Time)
-                ? "Always Up"
+                ? "全天可钓"
                 : data.OceanFish
                     ? PrintOceanTime(data.OceanTime)
                     : data.Interval.AlwaysUp()
@@ -294,20 +294,20 @@ public partial class Interface
         {
             if (!fish.Data.FishRestrictions.HasFlag(FishRestrictions.Weather))
             {
-                ImGuiUtil.DrawTextButton("No Weather Restrictions", Vector2.Zero, ColorId.HeaderWeather.Value());
+                ImGuiUtil.DrawTextButton("没有天气限制", Vector2.Zero, ColorId.HeaderWeather.Value());
                 return;
             }
 
             if (fish.WeatherIcons.Length == 0 && fish.TransitionIcons.Length == 0)
             {
-                ImGuiUtil.DrawTextButton("Unknown Weather Restrictions", Vector2.Zero, ColorId.HeaderWeather.Value());
+                ImGuiUtil.DrawTextButton("未知的天气限制。", Vector2.Zero, ColorId.HeaderWeather.Value());
                 return;
             }
 
             using var style = ImRaii.PushStyle(ImGuiStyleVar.ItemSpacing, ImGui.GetStyle().ItemSpacing / 2);
             if (fish.TransitionIcons.Length > 0)
             {
-                AlignTextToSize(fish.TransitionIcons.Length > 1 ? "Requires one of" : "Requires", weatherIconSize);
+                AlignTextToSize("", weatherIconSize);
                 style.Push(ImGuiStyleVar.ItemSpacing, Vector2.One * ImGuiHelpers.GlobalScale);
                 foreach (var w in fish.TransitionIcons)
                 {
@@ -318,7 +318,7 @@ public partial class Interface
                 style.Pop();
 
                 ImGui.SameLine();
-                AlignTextToSize(fish.WeatherIcons.Length > 1 ? "followed by one of" : "followed by", weatherIconSize);
+                AlignTextToSize(fish.WeatherIcons.Length > 1 ? "" : "⇒", weatherIconSize);
                 if (fish.WeatherIcons.Length == 0)
                 {
                     ImGui.SameLine();
@@ -336,7 +336,7 @@ public partial class Interface
             }
             else if (fish.WeatherIcons.Length > 0)
             {
-                AlignTextToSize(fish.WeatherIcons.Length > 1 ? "Requires one of" : "Requires", weatherIconSize);
+                AlignTextToSize("", weatherIconSize);
                 style.Push(ImGuiStyleVar.ItemSpacing, Vector2.One * ImGuiHelpers.GlobalScale);
                 foreach (var w in fish.WeatherIcons)
                 {
@@ -350,7 +350,7 @@ public partial class Interface
         {
             if (fish.Bait.Length == 0)
             {
-                ImGuiUtil.DrawTextButton("Unknown Catch Method", Vector2.Zero, 0xFF0000A0);
+                ImGuiUtil.DrawTextButton("未知的捕获方法。", Vector2.Zero, 0xFF0000A0);
                 return;
             }
 

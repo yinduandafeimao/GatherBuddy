@@ -93,15 +93,15 @@ public partial class Interface
 
                 var group = Items[idx];
 
-                if (!_plugin.GatherGroupManager.ChangeGroupNode(@group, @group.Nodes.Count, d.Node.Item, d.Node.EorzeaStartMinute,
+                if (!Plugin.GatherGroupManager.ChangeGroupNode(@group, @group.Nodes.Count, d.Node.Item, d.Node.EorzeaStartMinute,
                         d.Node.EorzeaEndMinute, d.Node.Annotation, false))
                 {
                     GatherBuddy.Log.Error($"Could not move node from group {d.Group.Name} to group {group.Name}.");
                     return;
                 }
 
-                _plugin.GatherGroupManager.ChangeGroupNode(d.Group, d.NodeIdx, null, null, null, null, true);
-                _plugin.GatherGroupManager.Save();
+                Plugin.GatherGroupManager.ChangeGroupNode(d.Group, d.NodeIdx, null, null, null, null, true);
+                Plugin.GatherGroupManager.Save();
             }
         }
 
@@ -222,8 +222,8 @@ public partial class Interface
     private static void DrawLocationInput(TimedGroup group, int nodeIdx, TimedGroupNode node)
     {
         if (DrawLocationInput(node.Item, node.PreferLocation, out var newLoc)
-         && _plugin.GatherGroupManager.ChangeGroupNodeLocation(group, nodeIdx, newLoc))
-            _plugin.GatherGroupManager.Save();
+         && Plugin.GatherGroupManager.ChangeGroupNodeLocation(group, nodeIdx, newLoc))
+            Plugin.GatherGroupManager.Save();
     }
 
     private void DrawGatherGroupNode(TimedGroup group, ref int idx, int minutes)
@@ -234,28 +234,28 @@ public partial class Interface
         var       annotationEdit = _gatherGroupCache.AnnotationEditIdx;
         ImGui.TableNextColumn();
         if (ImGuiUtil.DrawDisabledButton(FontAwesomeIcon.Trash.ToIconString(), IconButtonSize, "Delete this item.", false, true))
-            if (_plugin.GatherGroupManager.ChangeGroupNode(group, i, null, null, null, null, true))
+            if (Plugin.GatherGroupManager.ChangeGroupNode(group, i, null, null, null, null, true))
             {
                 --idx;
-                _plugin.GatherGroupManager.Save();
+                Plugin.GatherGroupManager.Save();
                 _gatherGroupCache.SetDirty();
             }
 
         ImGui.TableNextColumn();
         if (_gatherGroupCache.GatherableSelector.Draw(node.Item.Name[GatherBuddy.Language], out var newIdx)
-         && _plugin.GatherGroupManager.ChangeGroupNode(group, i, GatherGroupCache.AllGatherables[newIdx], null, null, null, false))
-            _plugin.GatherGroupManager.Save();
+         && Plugin.GatherGroupManager.ChangeGroupNode(group, i, GatherGroupCache.AllGatherables[newIdx], null, null, null, false))
+            Plugin.GatherGroupManager.Save();
 
         _gatherGroupCache.Selector.CreateDropSource(new GatherGroupDragDropData(group, node, i), node.Item.Name[GatherBuddy.Language]);
 
-        _gatherGroupCache.Selector.CreateDropTarget<GatherGroupDragDropData>(d => _plugin.GatherGroupManager.MoveNode(group, d.NodeIdx, i));
+        _gatherGroupCache.Selector.CreateDropTarget<GatherGroupDragDropData>(d => Plugin.GatherGroupManager.MoveNode(group, d.NodeIdx, i));
 
         ImGui.TableNextColumn();
         DrawTimeInput(node.EorzeaStartMinute, node.EorzeaEndMinute, (from, to) =>
         {
-            if (_plugin.GatherGroupManager.ChangeGroupNode(group, i, null, from, to, null, false))
+            if (Plugin.GatherGroupManager.ChangeGroupNode(group, i, null, from, to, null, false))
             {
-                _plugin.GatherGroupManager.Save();
+                Plugin.GatherGroupManager.Save();
                 _gatherGroupCache.SetDirty();
             }
         });
@@ -289,8 +289,8 @@ public partial class Interface
         {
             ImGui.SetNextItemWidth(400 * ImGuiHelpers.GlobalScale);
             if (ImGui.InputTextWithHint("##annotation", "Annotation...", ref annotation, 256, ImGuiInputTextFlags.EnterReturnsTrue)
-             && _plugin.GatherGroupManager.ChangeGroupNode(group, i, null, null, null, annotation, false))
-                _plugin.GatherGroupManager.Save();
+             && Plugin.GatherGroupManager.ChangeGroupNode(group, i, null, null, null, annotation, false))
+                Plugin.GatherGroupManager.Save();
             if (annotationEdit == _gatherGroupCache.AnnotationEditIdx && !ImGui.IsItemActive())
                 _gatherGroupCache.AnnotationEditIdx = -1;
         }
@@ -318,10 +318,10 @@ public partial class Interface
         var idx = _gatherGroupCache.NewItemIdx;
         ImGui.TableNextColumn();
         if (ImGuiUtil.DrawDisabledButton(FontAwesomeIcon.Plus.ToIconString(), IconButtonSize, "Add new item...", false, true)
-         && _plugin.GatherGroupManager.ChangeGroupNode(group, group.Nodes.Count, GatherGroupCache.AllGatherables[idx], null, null, null, false))
+         && Plugin.GatherGroupManager.ChangeGroupNode(group, group.Nodes.Count, GatherGroupCache.AllGatherables[idx], null, null, null, false))
         {
             _gatherGroupCache.SetDirty();
-            _plugin.GatherGroupManager.Save();
+            Plugin.GatherGroupManager.Save();
         }
 
         ImGui.TableNextColumn();
@@ -341,15 +341,15 @@ public partial class Interface
             ImGuiUtil.DrawTextButton("Name can not be empty.", Vector2.Zero, ColorId.WarningBg.Value());
             r = false;
         }
-        else if (newName != group.Name && _plugin.GatherGroupManager.Groups.ContainsKey(newName.ToLowerInvariant().Trim()))
+        else if (newName != group.Name && Plugin.GatherGroupManager.Groups.ContainsKey(newName.ToLowerInvariant().Trim()))
         {
             ImGui.SameLine();
             ImGuiUtil.DrawTextButton("Name is already in use.", Vector2.Zero, ColorId.WarningBg.Value());
             r = false;
         }
 
-        if (r && _plugin.GatherGroupManager.RenameGroup(group, newName))
-            _plugin.GatherGroupManager.Save();
+        if (r && Plugin.GatherGroupManager.RenameGroup(group, newName))
+            Plugin.GatherGroupManager.Save();
     }
 
     private void DrawDescField(TimedGroup group)
@@ -359,8 +359,8 @@ public partial class Interface
          || newDesc == group.Description)
             return;
 
-        if (_plugin.GatherGroupManager.ChangeDescription(group, newDesc))
-            _plugin.GatherGroupManager.Save();
+        if (Plugin.GatherGroupManager.ChangeDescription(group, newDesc))
+            Plugin.GatherGroupManager.Save();
     }
 
     private void DrawGatherGroup(TimedGroup group)
@@ -395,22 +395,22 @@ public partial class Interface
                 _gatherGroupCache.Selector.Current == null))
         {
             var preset = new GatherWindowPreset(_gatherGroupCache.Selector.Current!);
-            _plugin.GatherWindowManager.AddPreset(preset);
+            Plugin.GatherWindowManager.AddPreset(preset);
         }
 
         if (ImGuiUtil.DrawDisabledButton("Create Alarms", Vector2.Zero, "Create a new Alarm Group from this gather group.",
                 _gatherGroupCache.Selector.Current == null))
         {
             var preset = new AlarmGroup(_gatherGroupCache.Selector.Current!);
-            _plugin.AlarmManager.AddGroup(preset);
+            Plugin.AlarmManager.AddGroup(preset);
         }
 
         var       holdingCtrl = ImGui.GetIO().KeyCtrl;
         using var color       = ImRaii.PushColor(ImGuiCol.ButtonHovered, 0x8000A000, holdingCtrl);
-        if (ImGui.Button("Restore Default Groups") && holdingCtrl && _plugin.GatherGroupManager.SetDefaults(true))
+        if (ImGui.Button("Restore Default Groups") && holdingCtrl && Plugin.GatherGroupManager.SetDefaults(true))
         {
             _gatherGroupCache.Selector.TryRestoreCurrent();
-            _plugin.GatherGroupManager.Save();
+            Plugin.GatherGroupManager.Save();
         }
 
         color.Pop();
@@ -426,11 +426,11 @@ public partial class Interface
     private void DrawGatherGroupTab()
     {
         using var id  = ImRaii.PushId("Gather Groups");
-        using var tab = ImRaii.TabItem("Gather Groups");
+        using var tab = ImRaii.TabItem("采集分类");
 
         ImGuiUtil.HoverTooltip(
-            "Do you really need to catch a Dirty Herry from 8PM to 10PM but gather mythril ore otherwise?\n"
-          + "Set up your own gather groups! You can even share them with others!");
+            "你真的需要在晚上8点到10点采摘樱桃吗？还是收集秘银矿更重要呢\n"
+          + "建立自己的采集小组吧！甚至可以与他人分享！");
 
         if (!tab)
             return;

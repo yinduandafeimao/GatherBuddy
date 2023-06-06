@@ -140,11 +140,13 @@ public static class Communicator
             return;
 
         if (uptime.Start > GatherBuddy.Time.ServerTime)
-            Print("Next up in ",                     TimeInterval.DurationString(uptime.Start, GatherBuddy.Time.ServerTime, false),
-                GatherBuddy.Config.SeColorArguments, ".");
+            Print("距离下次出现还有 ",                     TimeInterval.DurationString(uptime.Start, GatherBuddy.Time.ServerTime, false),
+                GatherBuddy.Config.SeColorArguments, "。");
         else
-            Print("Currently up for the next ",      TimeInterval.DurationString(uptime.End, GatherBuddy.Time.ServerTime, false),
-                GatherBuddy.Config.SeColorArguments, ".");
+            Print("当前可采集，距离消失还有 ",
+                TimeInterval.DurationString(uptime.End, GatherBuddy.Time.ServerTime, false),
+                GatherBuddy.Config.SeColorArguments, 
+                "。");
     }
 
     public static void PrintCoordinates(SeString link)
